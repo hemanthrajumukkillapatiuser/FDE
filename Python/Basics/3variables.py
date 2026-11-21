@@ -85,3 +85,5 @@ def global_function_example1():
 
 global_function_example1()
 print(global_variabl_1)
+
+# no cha
