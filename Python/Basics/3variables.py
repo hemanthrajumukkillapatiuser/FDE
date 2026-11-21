@@ -69,11 +69,11 @@ print(english_mark, hidi_mark, cs_mark, total_marks)
 global_variable = "I am a global variable"
 
 def global_function_example():
-    global_variable = "I am a local variable"
+    global_variable = "I am a local variable" // 1
     print(global_variable)
 
 global_function_example()
-print(global_variable)
+print(global_variable) // 2 
 
 
 global_variabl_1 = "I am a global variable"
