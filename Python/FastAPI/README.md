@@ -1,145 +1,125 @@
-# FastAPI
+# FastAPI HTTP Operations Demo
 
-FastAPI is a Python framework for building web APIs. It uses standard Python
-type hints to validate input, convert data, and describe your API. It is built
-on Starlette and Pydantic, and generates interactive API documentation
-automatically.
+A small FastAPI demo that shows basic `GET`, `POST`, `PUT`, `PATCH`, and
+`DELETE` operations. It does not use a database or backend; request data is
+returned directly in the response.
 
-## Why use FastAPI?
+## Requirements
 
-- **Type-based validation:** Declare the data your endpoint expects with Python
-  types and Pydantic models.
-- **Automatic documentation:** FastAPI creates OpenAPI documentation and
-  interactive Swagger UI and ReDoc pages.
-- **Async support:** Use `async def` for asynchronous endpoints when your
-  application needs it. Regular `def` endpoints are supported too.
-- **Editor-friendly:** Type hints make code easier to understand and help
-  editors provide completion and diagnostics.
+- Python 3.9 or newer
+- Pip
 
-## Getting started
+## Installation
 
-Use Python and create a virtual environment in this folder:
+From this folder, install the dependencies:
 
 ```bash
-python -m venv .venv
+cd /Users/jeevantiwari/Desktop/FDE/Python/FastAPI
+python3 -m pip install -r requirements.txt
 ```
 
-Activate it:
+## Run locally
 
 ```bash
-# macOS or Linux
-source .venv/bin/activate
-
-# Windows PowerShell
-.venv\Scripts\Activate.ps1
+python3 -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-Install FastAPI and its standard command-line server tools:
+Keep the terminal running while using the API.
 
-```bash
-python -m pip install "fastapi[standard]"
+- Swagger UI: http://127.0.0.1:8000/docs
+- Demo endpoint: http://127.0.0.1:8000/demo
+
+Stop the server with `Ctrl+C`.
+
+## Available endpoints
+
+All operations use `/demo`.
+
+| Method | URL | Request body |
+| --- | --- | --- |
+| `GET` | `/demo?name=test` | Not required |
+| `POST` | `/demo` | JSON |
+| `PUT` | `/demo` | JSON |
+| `PATCH` | `/demo` | JSON |
+| `DELETE` | `/demo?name=test` | Not required |
+
+## Try the operations in Postman
+
+Set the base URL to:
+
+```text
+http://127.0.0.1:8000
 ```
 
-Create a file named `main.py`:
+### GET
 
-```python
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+Select `GET` and open:
 
-app = FastAPI(title="Books API")
-
-
-class Book(BaseModel):
-    title: str
-    author: str
-    year: int | None = None
-
-
-books: dict[int, Book] = {}
-
-
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the Books API"}
-
-
-@app.get("/books/{book_id}", response_model=Book)
-def read_book(book_id: int):
-    book = books.get(book_id)
-    if book is None:
-        raise HTTPException(status_code=404, detail="Book not found")
-    return book
-
-
-@app.post("/books/{book_id}", response_model=Book, status_code=201)
-def create_book(book_id: int, book: Book):
-    books[book_id] = book
-    return book
+```text
+http://127.0.0.1:8000/demo?name=test
 ```
 
-Start the development server from the folder containing `main.py`:
-
-```bash
-fastapi dev main.py
-```
-
-The server prints its local address, usually `http://127.0.0.1:8000`. Open
-these pages in your browser:
-
-- `http://127.0.0.1:8000/docs` — interactive Swagger UI
-- `http://127.0.0.1:8000/redoc` — ReDoc API reference
-- `http://127.0.0.1:8000/openapi.json` — generated OpenAPI schema
-
-The example stores books in memory, so its data is reset when the application
-restarts. Use a database for persistent application data.
-
-## How the example works
-
-- `FastAPI()` creates the application.
-- `@app.get(...)` and `@app.post(...)` register functions as HTTP endpoints.
-- `{book_id}` is a **path parameter**. The `int` annotation converts and
-  validates it as an integer.
-- `book: Book` is a **request body**. FastAPI parses the JSON body and
-  validates it against the Pydantic model.
-- `response_model=Book` documents and validates the response shape.
-- `HTTPException` returns an HTTP error response, here a `404 Not Found`.
-
-For example, create a book by sending a `POST` request to
-`/books/1` with this JSON body:
+Example response:
 
 ```json
 {
-  "title": "The Hobbit",
-  "author": "J. R. R. Tolkien",
-  "year": 1937
+  "message": "This is a GET response",
+  "method": "GET",
+  "path": "/demo",
+  "query": {
+    "name": "test"
+  }
 }
 ```
 
-Then request `GET /books/1` to retrieve it.
+### POST
 
-## Path, query, and body parameters
+Select `POST`, open `http://127.0.0.1:8000/demo`, and set:
 
-FastAPI uses endpoint function signatures to identify request data:
+- **Body**
+- **raw**
+- **JSON**
 
-- **Path parameters** are part of the URL, such as `/books/{book_id}`.
-- **Query parameters** follow `?` in the URL, such as `/books?limit=10`.
-  Declare them as function parameters not included in the route path.
-- **Request bodies** are commonly represented by Pydantic models, as in the
-  `create_book` endpoint.
+```json
+{
+  "name": "Ada",
+  "age": 36
+}
+```
 
-The parameter's Python type and default value help FastAPI validate the request
-and describe it in the API documentation.
+The response contains the submitted JSON in `data`.
 
-## Development and deployment
+### PUT
 
-`fastapi dev` is intended for local development and enables automatic reload.
-For a production deployment, follow the
-[FastAPI deployment guide](https://fastapi.tiangolo.com/deployment/) and use
-the deployment command and server configuration appropriate for your hosting
-environment. Do not rely on the in-memory example store for production data.
+Select `PUT`, open `http://127.0.0.1:8000/demo`, and send JSON in the body:
 
-## Learn more
+```json
+{
+  "name": "Ada",
+  "age": 36
+}
+```
 
-- [Official FastAPI tutorial](https://fastapi.tiangolo.com/tutorial/)
-- [FastAPI user guide](https://fastapi.tiangolo.com/)
-- [Pydantic documentation](https://docs.pydantic.dev/)
+The response contains the submitted JSON in `data`.
+
+### PATCH
+
+Select `PATCH`, open `http://127.0.0.1:8000/demo`, and send JSON in the body:
+
+```json
+{
+  "age": 37
+}
+```
+
+The response contains the submitted JSON in `data`.
+
+### DELETE
+
+Select `DELETE` and open:
+
+```text
+http://127.0.0.1:8000/demo?name=test
+```
+
+The response includes the delete method, path, and query parameters.
